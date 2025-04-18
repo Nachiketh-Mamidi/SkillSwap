@@ -3,7 +3,9 @@ import axios from 'axios';
 import './App.css';
 import NavigationBar from './components/Navbar'; // Import the Navbar component
 
-const API_BASE = 'http://localhost:8080'; // Replace with your backend URL
+// const API_BASE = 'http://localhost:8080'; // Replace with your backend URL
+const API_BASE = 'http://18.117.75.10:8080'; // Replace with your backend URL
+
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Add, Search } from '@mui/icons-material';
 
-const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://18.117.75.10:8080'; 
 
 export default function Home() {
   const token = localStorage.getItem('token');

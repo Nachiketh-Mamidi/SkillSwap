@@ -2,7 +2,8 @@
 FROM node:16 as build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
+RUN node --max_old_space_size=4096 node_modules/.bin/react-scripts build
 COPY . .
 RUN npm run build
 
