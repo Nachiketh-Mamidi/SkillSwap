@@ -7,24 +7,12 @@ services:
     environment:
       - PORT=8080
       - NODE_ENV=production
-    depends_on:
-      - db
+      - JWT_SECRET=kES0nGrhxxadT/xYzuXmU94IP1mPcJB7+/o78eOfm2w=
 
   frontend:
     build:
       context: ./frontend
     ports:
-      - "3000:80"
+      - "80:80"
     depends_on:
       - backend
-
-  db:
-    image: mongo
-    container_name: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo-data:/data/db
-
-volumes:
-  mongo-data:
