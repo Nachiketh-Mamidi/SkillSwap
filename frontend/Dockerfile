@@ -11,8 +11,15 @@ RUN npm install
 # Copy the rest of the application code
 COPY . .
 
+# Build the React app
+RUN npm run build
+
+# Use a lightweight web server to serve the built app
+FROM nginx:alpine
+COPY --from=0 /app/build /usr/share/nginx/html
+
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 80
 
 # Start the server
-CMD ["npm", "start"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
+import NavigationBar from './components/Navbar'; // Import the Navbar component
 
-const API_BASE = 'https://your-cloud-run-url.com'; // Replace with your backend URL
+const API_BASE = 'http://localhost:8080'; // Replace with your backend URL
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
@@ -23,6 +24,12 @@ function App() {
     const res = await axios.post(`${API_BASE}/auth/login`, { username, password });
     localStorage.setItem('token', res.data.token);
     setToken(res.data.token);
+  };
+
+  const signOut = () => {
+    setToken('');
+    setProfile(null);
+    localStorage.removeItem('token');
   };
 
   const fetchProfile = async () => {
@@ -54,6 +61,9 @@ function App() {
 
   return (
     <div className="App">
+      {/* Add the NavigationBar */}
+      <NavigationBar isAuthenticated={!!token} onSignOut={signOut} />
+
       <h1>SkillBarter</h1>
 
       {!token && (
