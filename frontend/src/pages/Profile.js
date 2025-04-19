@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
 
-const API_BASE = 'http://18.117.75.10:8080'; 
+// const API_BASE = 'http://18.117.75.10:8080'; 
+const API_BASE = 'http://localhost:8080';
 
 export default function Profile() {
   const token = localStorage.getItem('token');
@@ -82,7 +83,7 @@ export default function Profile() {
     <Container className="mt-5">
       {error && <Alert variant="danger">{error}</Alert>}
       {user && (
-        <Card className="p-4 shadow-lg" style={{ borderRadius: '15px', backgroundColor: '#f0f8ff' }}>
+        <Card className="p-4 shadow-lg" style={{ borderRadius: '15px', background: 'linear-gradient(to right, #e3f2fd, #ffffff)' }}>
           <Row>
             <Col md={4} className="text-center">
               <div
@@ -97,6 +98,7 @@ export default function Profile() {
                   alignItems: 'center',
                   fontSize: '2rem',
                   margin: '0 auto',
+                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
                 }}
               >
                 {user.name[0]}
@@ -192,6 +194,20 @@ export default function Profile() {
           Add Note
         </Button>
       </Form>
+
+      {/* Footer */}
+      <footer
+        style={{
+          marginTop: '50px',
+          padding: '20px',
+          textAlign: 'center',
+          backgroundColor: '#343a40',
+          color: 'white',
+          borderRadius: '10px',
+        }}
+      >
+        <p>© 2023 SkillSwap. All rights reserved.</p>
+      </footer>
     </Container>
   );
 }

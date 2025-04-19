@@ -2,7 +2,19 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const db = require('../db');
+const passwordValidator = require('password-validator');
+const emailValidator = require('email-validator');
 const router = express.Router();
+
+// Create a password validation schema
+const passwordSchema = new passwordValidator();
+passwordSchema
+  .is().min(8) // Minimum length 8
+  .is().max(100) // Maximum length 100
+  .has().uppercase() // Must have uppercase letters
+  .has().lowercase() // Must have lowercase letters
+  .has().digits() // Must have digits
+  .has().not().spaces(); // Should not have spaces
 
 router.post('/signup', async (req, res) => {
   try {
@@ -11,6 +23,18 @@ router.post('/signup', async (req, res) => {
     // Validate input
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Email, password, and name are required' });
+    }
+
+    // Validate email format
+    if (!emailValidator.validate(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Validate password strength
+    if (!passwordSchema.validate(password)) {
+      return res.status(400).json({
+        error: 'Password must be at least 8 characters long, include uppercase, lowercase, digits, and have no spaces.'
+      });
     }
 
     // Check if the email already exists
@@ -45,11 +69,16 @@ router.post('/signup', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body; // Use email instead of username
+    const { email, password } = req.body;
 
     // Validate input
     if (!email || !password) {
       return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Validate email format
+    if (!emailValidator.validate(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
     }
 
     // Query the database using email
