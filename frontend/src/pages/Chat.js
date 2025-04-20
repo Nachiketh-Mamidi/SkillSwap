@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 
 // const API_BASE = 'http://localhost:8080';
-const API_BASE = 'http://18.117.75.10:8080'; // Replace with your backend URL
+const API_BASE = 'http://3.143.5.51:8080'; // Replace with your backend URL
 
 export default function Chat() {
   const location = useLocation();
