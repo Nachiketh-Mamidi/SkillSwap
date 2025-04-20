@@ -16,7 +16,8 @@ import { Add, Search } from '@mui/icons-material';
 import { Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
-const API_BASE = 'http://localhost:8080';
+// const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://18.117.75.10:8080'; // Replace with your backend URL
 
 export default function Home() {
   const token = localStorage.getItem('token');

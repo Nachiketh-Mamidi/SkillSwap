@@ -3,7 +3,8 @@ import { Navbar, Nav, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8080';
+// const API_BASE = 'http://localhost:8080';
+const API_BASE = 'http://18.117.75.10:8080'; // Replace with your backend URL
 
 const NavigationBar = ({ isAuthenticated, onSignOut }) => {
   const [userName, setUserName] = useState('');
