@@ -197,7 +197,7 @@ export default function Chat() {
               })
             ) : (
               <Typography sx={{ p: 2, textAlign: 'center', color: 'gray' }}>
-                No chats available. Start a new conversation!
+                No chats available. Start a new conversation by matching, check out skills leadership board to know most used skills!
               </Typography>
             )}
           </List>
