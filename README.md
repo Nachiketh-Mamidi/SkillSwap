@@ -2,6 +2,18 @@
 
 SkillSwap is a full-stack web application that allows users to barter/exchange skills. Users can sign up, list the skills they want to teach and learn, and get matched with others who have complementary skill sets.
 
+Access at link: http://3.143.5.51/home 
+
+Use Account for testing purposes:
+- Name: Charlie
+- Email: charlie@example.co
+- password: Test@123
+
+Second account for testing messaging feature:
+- Name: David
+- Email: david@example.com
+- password: Test@123
+
 ---
 
 ## 🏗 Project Structure
@@ -138,8 +150,8 @@ The frontend includes the following pages:
 
 ## 📦 Deployment
 
-- **Frontend**: Deploy via Firebase Hosting, Vercel, or Netlify.
-- **Backend**: Deploy via Google Cloud Run or App Engine.
+- **Frontend**: Deploy via AWS ec2 t2.medium, Access Link: http://3.143.5.51/home 
+- **Backend**: Deployed via AWS ec2 t2.medium
 
 Let us know if you need help containerizing or deploying the app!
 
