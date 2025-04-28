@@ -1,21 +1,20 @@
-# Use Node.js as the base image
+# Use Node.js LTS as the base image
 FROM node:16
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and install dependencies
+# Copy package.json and package-lock.json
 COPY package*.json ./
-RUN npm install
+
+# Install dependencies
+RUN npm install --production
 
 # Copy the rest of the application code
 COPY . .
 
-# Copy the .env file
-COPY .env .env
-
-# Expose the port the app runs on
+# Expose the port
 EXPOSE 8080
 
-# Start the server
-CMD ["npm", "start"]
+# Start the backend
+CMD ["node", "src/index.js"]
