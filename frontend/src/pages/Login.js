@@ -11,7 +11,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 
-const API_BASE = 'http://3.142.200.189:8080'; 
+const API_BASE = 'http://3.142.200.189:8080';
 // const API_BASE = 'http://localhost:8080';
 
 export default function Login() {
