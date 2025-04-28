@@ -2,11 +2,11 @@
 
 SkillSwap is a full-stack web application that allows users to barter/exchange skills. Users can sign up, list the skills they want to teach and learn, and get matched with others who have complementary skill sets.
 
-Access at link: http://3.143.5.51/home 
+Access at Website: http://3.143.5.51/home 
 
 Use Account for testing purposes:
 - Name: Charlie
-- Email: charlie@example.co
+- Email: charlie@example.com
 - password: Test@123
 
 Second account for testing messaging feature:

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
 
-const API_BASE = 'http://3.143.5.51:8080'; 
+const API_BASE = 'http://3.142.200.189:8080'; 
 // const API_BASE = 'http://localhost:8080';
 
 export default function Profile() {

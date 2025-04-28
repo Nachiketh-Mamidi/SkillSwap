@@ -4,7 +4,7 @@ import './App.css';
 import NavigationBar from './components/Navbar'; // Import the Navbar component
 
 // const API_BASE = 'http://localhost:8080'; // Replace with your backend URL
-const API_BASE = 'http://3.143.5.51:8080'; // Replace with your backend URL
+const API_BASE = 'http://3.142.200.189:8080'; // Replace with your backend URL
 
 
 function App() {
