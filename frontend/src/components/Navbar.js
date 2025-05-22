@@ -1,56 +1,76 @@
-import React, { useEffect, useState } from 'react';
-import { Navbar, Nav, Button } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import axios from 'axios';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
+import { SunIcon, MoonIcon } from '@heroicons/react/24/outline';
 
-// const API_BASE = 'http://localhost:8080';
-const API_BASE = 'http://3.142.200.189:8080';
+const Navbar = () => {
+  const { darkMode, toggleDarkMode } = useTheme();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
-const NavigationBar = ({ isAuthenticated, onSignOut }) => {
-  const [userName, setUserName] = useState('');
-  const navigate = useNavigate(); // Initialize useNavigate
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        try {
-          const headers = { Authorization: `Bearer ${token}` };
-          const res = await axios.get(`${API_BASE}/user/me`, { headers });
-          setUserName(res.data.name || 'User');
-        } catch (err) {
-          console.error('Error fetching user name:', err);
-        }
-      }
-    };
-
-    fetchUserName();
-  }, []);
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="px-3">
-      <Navbar.Brand onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-        SkillSwap
-      </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="me-auto">
-          {isAuthenticated && <Nav.Link onClick={() => navigate('/home')}>Home</Nav.Link>}
-          {isAuthenticated && <Nav.Link onClick={() => navigate('/chat')}>Chat</Nav.Link>}
-          {isAuthenticated && <Nav.Link onClick={() => navigate('/profile')}>Profile</Nav.Link>}
-          {!isAuthenticated && <Nav.Link onClick={() => navigate('/login')}>Login</Nav.Link>}
-        </Nav>
-        {isAuthenticated && (
-          <div className="d-flex align-items-center">
-            <span className="text-white me-3">Hello, {userName}</span>
-            <Button variant="outline-light" onClick={onSignOut}>
-              Sign Out
-            </Button>
+    <nav className="bg-white dark:bg-gray-800 shadow-lg">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          <Link to="/home" className="text-xl font-bold text-primary-600 dark:text-primary-400">
+            SkillSwap
+          </Link>
+
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleDarkMode}
+              className="dark-mode-toggle"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? (
+                <SunIcon className="h-6 w-6 text-yellow-400" />
+              ) : (
+                <MoonIcon className="h-6 w-6 text-gray-700" />
+              )}
+            </button>
+
+            {token ? (
+              <>
+                <Link
+                  to="/home"
+                  className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400"
+                >
+                  Home
+                </Link>
+                <Link
+                  to="/profile"
+                  className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/chat"
+                  className="text-gray-700 dark:text-gray-200 hover:text-primary-600 dark:hover:text-primary-400"
+                >
+                  Chat
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="btn btn-primary"
+                >
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="btn btn-primary">
+                Sign In
+              </Link>
+            )}
           </div>
-        )}
-      </Navbar.Collapse>
-    </Navbar>
+        </div>
+      </div>
+    </nav>
   );
 };
 
-export default NavigationBar;
+export default Navbar;

@@ -1,23 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Chip,
-  Button,
-  TextField,
-  Alert,
-  Box,
-} from '@mui/material';
-import { Add, Search } from '@mui/icons-material';
-import { Avatar } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
-// const API_BASE = 'http://localhost:8080';
-const API_BASE = 'http://3.142.200.189:8080'; // Replace with your backend URL
+// const API_BASE = 'http://3.142.200.189:8080';
+const API_BASE = 'http://localhost:8080';
 
 export default function Home() {
   const token = localStorage.getItem('token');
@@ -29,7 +15,7 @@ export default function Home() {
   const [matches, setMatches] = useState([]);
   const [error, setError] = useState(null);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -47,7 +33,6 @@ export default function Home() {
         }
       }
     };
-
     fetchUser();
   }, []);
 
@@ -57,7 +42,6 @@ export default function Home() {
         teachSkills: teachSkills || [],
         learnSkills: learnSkills || [],
       };
-
       await axios.put(`${API_BASE}/user/me`, payload, { headers });
       alert('Skills updated');
     } catch (err) {
@@ -68,10 +52,9 @@ export default function Home() {
   const findMatches = async () => {
     try {
       const res = await axios.get(`${API_BASE}/match`, { headers });
-      setMatches(res.data || []); // Ensure matches is always an array
+      setMatches(res.data || []);
       setError(null);
     } catch (err) {
-      console.error('Error fetching matches:', err);
       setError('Failed to fetch matches');
     }
   };
@@ -83,253 +66,106 @@ export default function Home() {
         { recipientId },
         { headers }
       );
-  
       navigate('/chat', { state: { chatId: res.data.chatId } });
     } catch (err) {
-      console.error('Error creating or fetching chat:', err);
       alert('Failed to connect. Please try again.');
     }
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Container maxWidth="lg" sx={{ mt: 4, flex: 1 }}>
-        {error && <Alert severity="error">{error}</Alert>}
-
-        {/* Hero Section */}
-        <Card
-          sx={{
-            mb: 4,
-            p: 3,
-            textAlign: 'center',
-            backgroundColor: '#e3f2fd',
-            borderRadius: '15px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-          }}
-        >
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Welcome, {user?.name || 'User'}!
-          </Typography>
-          <Typography variant="subtitle1" color="textSecondary">
-            Ready to swap skills and learn something new today?
-          </Typography>
-        </Card>
-
-        {/* Skills Section */}
-        <Grid container spacing={4} justifyContent="center" alignItems="center">
-          <Grid item xs={12} md={6}>
-            <Card
-              sx={{
-                borderRadius: '15px',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h6" gutterBottom>
-                  Skills You Can Teach
-                </Typography>
-                {teachSkills.length > 0 ? (
-                  teachSkills.map((skill, index) => (
-                    <Chip
-                      key={index}
-                      label={skill}
-                      color="success"
-                      sx={{ mr: 1, mb: 1 }}
-                    />
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      {error && <div className="mb-4 text-red-500 bg-red-100 rounded p-2">{error}</div>}
+      {/* Hero Section */}
+      <div className="card text-center mb-8">
+        <div className="heading">Welcome, {user?.name || 'User'}!</div>
+        <div className="subheading">Ready to swap skills and learn something new today?</div>
+      </div>
+      {/* Skills Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="card">
+          <div className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">Skills You Can Teach</div>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {teachSkills.length > 0 ? (
+              teachSkills.map((skill, idx) => (
+                <span key={idx} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs">{skill}</span>
+              ))
+            ) : (
+              <span className="text-gray-400 text-xs">No skills added yet.</span>
+            )}
+          </div>
+          <input
+            className="input w-full placeholder-gray-400 dark:placeholder-gray-300"
+            placeholder="Add Skills You Can Teach (comma separated)"
+            value={teachSkills.join(', ')}
+            onChange={e => setTeachSkills(e.target.value.split(',').map(s => s.trim()))}
+          />
+        </div>
+        <div className="card">
+          <div className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-2">Skills You Want to Learn</div>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {learnSkills.length > 0 ? (
+              learnSkills.map((skill, idx) => (
+                <span key={idx} className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-xs">{skill}</span>
+              ))
+            ) : (
+              <span className="text-gray-400 text-xs">No skills added yet.</span>
+            )}
+          </div>
+          <input
+            className="input w-full placeholder-gray-400 dark:placeholder-gray-300"
+            placeholder="Add Skills You Want to Learn (comma separated)"
+            value={learnSkills.join(', ')}
+            onChange={e => setLearnSkills(e.target.value.split(',').map(s => s.trim()))}
+          />
+        </div>
+      </div>
+      {/* Actions */}
+      <div className="flex gap-4 justify-center mb-8">
+        <button className="btn btn-primary" onClick={updateSkills}>Update Skills</button>
+        <button className="btn btn-primary" onClick={findMatches}>Find Matches</button>
+      </div>
+      {/* Matches Section */}
+      <div className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-4 text-center">Matches</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {matches.length > 0 ? (
+          matches.map((match) => (
+            <div key={match.id} className="card flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-primary-500 flex items-center justify-center text-2xl text-white shadow-lg mb-2">
+                {match.name?.[0] || '?'}
+              </div>
+              <div className="font-bold text-gray-900 dark:text-gray-100">{match.name || 'Unknown'}</div>
+              <div className="text-gray-500 dark:text-gray-300 text-sm mb-2">{match.email || 'No email provided'}</div>
+              <div className="text-xs font-semibold text-gray-700 dark:text-gray-200 mt-2">Skills They Can Teach:</div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {match.teachSkills?.length > 0 ? (
+                  match.teachSkills.map((skill, idx) => (
+                    <span key={idx} className="bg-green-200 text-green-800 px-3 py-1 rounded-full text-xs">{skill}</span>
                   ))
                 ) : (
-                  <Typography color="textSecondary">No skills added yet.</Typography>
+                  <span className="text-gray-400 text-xs">No skills listed</span>
                 )}
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Add Skills You Can Teach"
-                  value={teachSkills.join(', ')}
-                  onChange={(e) => setTeachSkills(e.target.value.split(',').map((s) => s.trim()))}
-                  sx={{ mt: 2 }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Card
-              sx={{
-                borderRadius: '15px',
-                boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-              }}
-            >
-              <CardContent sx={{ textAlign: 'center' }}>
-                <Typography variant="h6" gutterBottom>
-                  Skills You Want to Learn
-                </Typography>
-                {learnSkills.length > 0 ? (
-                  learnSkills.map((skill, index) => (
-                    <Chip
-                      key={index}
-                      label={skill}
-                      color="primary"
-                      sx={{ mr: 1, mb: 1 }}
-                    />
+              </div>
+              <div className="text-xs font-semibold text-gray-700 dark:text-gray-200 mt-2">Skills They Want to Learn:</div>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {match.learnSkills?.length > 0 ? (
+                  match.learnSkills.map((skill, idx) => (
+                    <span key={idx} className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-xs">{skill}</span>
                   ))
                 ) : (
-                  <Typography color="textSecondary">No skills added yet.</Typography>
+                  <span className="text-gray-400 text-xs">No skills listed</span>
                 )}
-                <TextField
-                  fullWidth
-                  variant="outlined"
-                  label="Add Skills You Want to Learn"
-                  value={learnSkills.join(', ')}
-                  onChange={(e) => setLearnSkills(e.target.value.split(',').map((s) => s.trim()))}
-                  sx={{ mt: 2 }}
-                />
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
-
-        {/* Actions */}
-        <Grid container spacing={2} sx={{ mt: 3 }} justifyContent="center">
-          <Grid item>
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<Add />}
-              onClick={updateSkills}
-              sx={{
-                borderRadius: '20px',
-                background: 'linear-gradient(to right, #4caf50, #81c784)',
-                '&:hover': {
-                  background: 'linear-gradient(to right, #388e3c, #66bb6a)',
-                },
-              }}
-            >
-              Update Skills
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<Search />}
-              onClick={findMatches}
-              sx={{
-                borderRadius: '20px',
-                background: 'linear-gradient(to right, #2196f3, #64b5f6)',
-                '&:hover': {
-                  background: 'linear-gradient(to right, #1976d2, #42a5f5)',
-                },
-              }}
-            >
-              Find Matches
-            </Button>
-          </Grid>
-        </Grid>
-
-        {/* Matches Section */}
-        <Typography variant="h5" sx={{ mt: 4, mb: 2, textAlign: 'center' }}>
-          Matches
-        </Typography>
-        <Grid container spacing={4}>
-          {matches.length > 0 ? (
-            matches.map((match) => (
-              <Grid item xs={12} sm={6} md={4} key={match.id}>
-                <Card
-                  sx={{
-                    borderRadius: '15px',
-                    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-                    backgroundColor: '#fff',
-                    overflow: 'hidden',
-                    position: 'relative',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    '&:hover': {
-                      transform: 'scale(1.05)',
-                      boxShadow: '0 6px 15px rgba(0, 0, 0, 0.2)',
-                    },
-                  }}
-                >
-                  <CardContent>
-                    <Avatar
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        margin: '0 auto',
-                        mb: 2,
-                        backgroundColor: '#007bff',
-                        fontSize: '2rem',
-                      }}
-                    >
-                      {match.name?.[0] || '?'}
-                    </Avatar>
-                    <Typography variant="h6" align="center">
-                      {match.name || 'Unknown'}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary" align="center">
-                      {match.email || 'No email provided'}
-                    </Typography>
-                    <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                      Skills They Can Teach:
-                    </Typography>
-                    {match.teachSkills?.length > 0 ? (
-                      match.teachSkills.map((skill, index) => (
-                        <Chip
-                          key={index}
-                          label={skill}
-                          color="success"
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      ))
-                    ) : (
-                      <Typography color="textSecondary">No skills listed</Typography>
-                    )}
-                    <Typography variant="subtitle1" sx={{ mt: 2 }}>
-                      Skills They Want to Learn:
-                    </Typography>
-                    {match.learnSkills?.length > 0 ? (
-                      match.learnSkills.map((skill, index) => (
-                        <Chip
-                          key={index}
-                          label={skill}
-                          color="primary"
-                          sx={{ mr: 1, mb: 1 }}
-                        />
-                      ))
-                    ) : (
-                      <Typography color="textSecondary">No skills listed</Typography>
-                    )}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      fullWidth
-                      sx={{ mt: 2, borderRadius: '20px' }}
-                      onClick={() => handleConnect(match.id)} // Pass recipientId to handleConnect
-                    >
-                      Connect
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))
-          ) : (
-            <Typography color="textSecondary" sx={{ textAlign: 'center', width: '100%' }}>
-              No matches found yet. Click "Find Matches" to get started!
-            </Typography>
-          )}
-        </Grid>
-      </Container>
+              </div>
+              <button className="btn btn-primary mt-2 w-full" onClick={() => handleConnect(match.id)}>Connect</button>
+            </div>
+          ))
+        ) : (
+          <div className="text-gray-400 col-span-full text-center">No matches found yet. Click 'Find Matches' to get started!</div>
+        )}
+      </div>
       {/* Footer */}
-    <Box
-      component="footer"
-      sx={{
-        py: 2,
-        px: 3,
-        mt: 'auto',
-        backgroundColor: '#343a40',
-        color: 'white',
-        textAlign: 'center',
-      }}
-    >
-      <Typography variant="body2">© 2023 SkillSwap. All rights reserved.</Typography>
-    </Box>
-    </Box>
+      <footer className="mt-10 p-4 text-center bg-gray-800 text-gray-100 rounded-lg">
+        © 2023 SkillSwap. All rights reserved.
+      </footer>
+    </div>
   );
 }

@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
 
-const API_BASE = 'http://3.142.200.189:8080';
-// const API_BASE = 'http://localhost:8080';
+// const API_BASE = 'http://3.142.200.189:8080';
+const API_BASE = 'http://localhost:8080';
 
 export default function Profile() {
   const token = localStorage.getItem('token');
@@ -38,13 +37,12 @@ export default function Profile() {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, []);
 
   const updateUserDetails = async () => {
     try {
-      const payload = { name, phoneNumber, city }; // Include name, phoneNumber, and city
+      const payload = { name, phoneNumber, city };
       await axios.put(`${API_BASE}/user/me`, payload, { headers });
       setUser({ ...user, name, phoneNumber, city });
       setIsEditing(false);
@@ -60,7 +58,6 @@ export default function Profile() {
       alert('Comment cannot be empty');
       return;
     }
-
     try {
       const res = await axios.post(`${API_BASE}/user/me/comments`, { text: newComment }, { headers });
       setComments([...comments, res.data.comment]);
@@ -73,141 +70,78 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
-        <Spinner animation="border" />
-      </Container>
+      <div className="flex items-center justify-center h-[80vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
+      </div>
     );
   }
 
   return (
-    <Container className="mt-5">
-      {error && <Alert variant="danger">{error}</Alert>}
+    <div className="max-w-2xl mx-auto py-8 px-4">
+      {error && <div className="mb-4 text-red-500 bg-red-100 rounded p-2">{error}</div>}
       {user && (
-        <Card className="p-4 shadow-lg" style={{ borderRadius: '15px', background: 'linear-gradient(to right, #e3f2fd, #ffffff)' }}>
-          <Row>
-            <Col md={4} className="text-center">
-              <div
-                style={{
-                  width: '150px',
-                  height: '150px',
-                  borderRadius: '50%',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  fontSize: '2rem',
-                  margin: '0 auto',
-                  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-                }}
-              >
-                {user.name[0]}
+        <div className="card flex flex-col items-center mb-8">
+          <div className="w-24 h-24 rounded-full bg-primary-500 flex items-center justify-center text-4xl text-white shadow-lg mb-4 border-4 border-white dark:border-gray-800">
+            {user.name[0]}
+          </div>
+          <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{user.name}</div>
+          <div className="text-gray-500 dark:text-gray-300">{user.city}</div>
+          <div className="mt-4 space-y-1 text-center">
+            <div className="text-gray-700 dark:text-gray-200"><b>Email:</b> {user.email}</div>
+            <div className="text-gray-700 dark:text-gray-200"><b>Phone Number:</b> {user.phoneNumber}</div>
+            <div className="text-gray-700 dark:text-gray-200"><b>City:</b> {user.city}</div>
+          </div>
+          {isEditing ? (
+            <div className="w-full mt-4">
+              <div className="mb-2">
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">Name</label>
+                <input className="input w-full" type="text" value={name} onChange={e => setName(e.target.value)} />
               </div>
-              <h3 className="mt-3">{user.name}</h3>
-              <p className="text-muted">{user.city}</p>
-            </Col>
-            <Col md={8}>
-              {isEditing ? (
-                <>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      type="email"
-                      value={email}
-                      readOnly // Make Email field read-only
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Phone Number</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <Form.Label>City</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                    />
-                  </Form.Group>
-                  <Button variant="success" onClick={updateUserDetails} className="me-2">
-                    Save Changes
-                  </Button>
-                  <Button variant="secondary" onClick={() => setIsEditing(false)}>
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <p><strong>Email:</strong> {user.email}</p>
-                  <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
-                  <p><strong>City:</strong> {user.city}</p>
-                  <Button variant="primary" onClick={() => setIsEditing(true)}>
-                    Edit Details
-                  </Button>
-                </>
-              )}
-            </Col>
-          </Row>
-        </Card>
+              <div className="mb-2">
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">Email</label>
+                <input className="input w-full" type="email" value={email} readOnly />
+              </div>
+              <div className="mb-2">
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">Phone Number</label>
+                <input className="input w-full" type="text" value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} />
+              </div>
+              <div className="mb-2">
+                <label className="block text-gray-700 dark:text-gray-200 mb-1">City</label>
+                <input className="input w-full" type="text" value={city} onChange={e => setCity(e.target.value)} />
+              </div>
+              <button className="btn btn-primary mr-2" onClick={updateUserDetails}>Save Changes</button>
+              <button className="btn mt-2" onClick={() => setIsEditing(false)}>Cancel</button>
+            </div>
+          ) : (
+            <button className="btn btn-primary mt-4" onClick={() => setIsEditing(true)}>Edit Details</button>
+          )}
+        </div>
       )}
 
-      <h4 className="mt-5">Notes</h4>
-      <Row>
-        {comments.length > 0 ? (
-          comments.map((comment) => (
-            <Col md={12} key={comment.id} className="mb-3">
-              <Card className="shadow-sm">
-                <Card.Body>
-                  <Card.Text>{comment.text}</Card.Text>
-                  <small className="text-muted">{new Date(comment.timestamp).toLocaleString()}</small>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))
-        ) : (
-          <p>Add notes</p>
-        )}
-      </Row>
-
-      <Form className="mt-4">
-        <Form.Group className="mb-3">
-          <Form.Control
-            type="text"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write your comment here..."
-          />
-        </Form.Group>
-        <Button onClick={addComment} variant="primary">
-          Add Note
-        </Button>
-      </Form>
+      <div className="mb-2 font-semibold text-lg text-gray-900 dark:text-gray-100">Notes</div>
+      {comments.length > 0 ? (
+        comments.map(comment => (
+          <div key={comment.id} className="bg-gray-100 dark:bg-gray-700 rounded p-3 mb-2">
+            <div className="text-gray-800 dark:text-gray-100">{comment.text}</div>
+            <div className="text-xs text-gray-400">{new Date(comment.timestamp).toLocaleString()}</div>
+          </div>
+        ))
+      ) : (
+        <div className="text-gray-400 mb-4">No notes yet.</div>
+      )}
+      <input
+        className="input mt-4 w-full placeholder-gray-400 dark:placeholder-gray-300"
+        placeholder="Write your comment here..."
+        aria-label="Write your comment here"
+        value={newComment}
+        onChange={e => setNewComment(e.target.value)}
+      />
+      <button className="btn btn-primary mt-2" aria-label="Add Note" onClick={addComment}>Add Note</button>
 
       {/* Footer */}
-      <footer
-        style={{
-          marginTop: '50px',
-          padding: '20px',
-          textAlign: 'center',
-          backgroundColor: '#343a40',
-          color: 'white',
-          borderRadius: '10px',
-        }}
-      >
-        <p>© 2023 SkillSwap. All rights reserved.</p>
+      <footer className="mt-10 p-4 text-center bg-gray-800 text-gray-100 rounded-lg">
+        © 2023 SkillSwap. All rights reserved.
       </footer>
-    </Container>
+    </div>
   );
 }

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const router = express.Router();
+const admin = require('firebase-admin');
 
 router.get('/me', async (req, res) => {
   try {
@@ -27,6 +28,7 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// updated the user details
 router.put('/me', async (req, res) => {
   try {
     const { name, phoneNumber, city, teachSkills, learnSkills } = req.body;
@@ -64,6 +66,10 @@ router.put('/me', async (req, res) => {
 
     // Update user document
     await db.collection('users').doc(req.user.id).update(updateData);
+
+    // Update skill index
+    await updateSkillIndex(req.user.id, req.body.oldTeachSkills || [], req.body.oldLearnSkills || [], req.body.teachSkills, req.body.learnSkills);
+
     res.json({ message: 'Profile updated successfully' });
   } catch (err) {
     console.error('Error updating user profile:', err);
@@ -71,6 +77,7 @@ router.put('/me', async (req, res) => {
   }
 });
 
+//
 router.post('/me/comments', async (req, res) => {
   try {
     const { text } = req.body;
@@ -93,5 +100,121 @@ router.post('/me/comments', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// add an endpoint to delete
+router.delete('/me', async (req, res) => {
+    try {
+      const userDoc = await db.collection('users').doc(req.user.id).get();
+      if (!userDoc.exists) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      // see if user exits
+      // delete the user from the database
+      // delete the resources attached to the use
+
+      // 
+      // chats history
+      const comments = await userDoc.collection('comments').get();
+      const batch = db.batch();
+      comments.forEach(comment => {
+        batch.delete(comment.ref);
+      })
+
+      await batch.commit();
+      await userDoc.delete()
+
+      res.json({ message: 'User deleted successfully' });
+
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Helper to get unique user IDs except the current user
+const uniqueExcept = (arr, exceptId) => [...new Set(arr.filter(id => id !== exceptId))];
+
+router.get('/', async (req, res) => {
+  try {
+    const meDoc = await db.collection('users').doc(req.user.id).get();
+    if (!meDoc.exists) return res.status(404).json({ error: 'User not found' });
+    const me = meDoc.data();
+
+    // 1. Find users who want to learn what I can teach
+    let learnMatches = [];
+    for (const skill of me.teachSkills || []) {
+      const skillDoc = await db.collection('skills').doc(skill).get();
+      if (skillDoc.exists) {
+        learnMatches.push(...(skillDoc.data().learners || []));
+      }
+    }
+
+    // 2. Find users who can teach what I want to learn
+    let teachMatches = [];
+    for (const skill of me.learnSkills || []) {
+      const skillDoc = await db.collection('skills').doc(skill).get();
+      if (skillDoc.exists) {
+        teachMatches.push(...(skillDoc.data().teachers || []));
+      }
+    }
+
+    // 3. Combine and deduplicate, exclude self
+    const matchUserIds = uniqueExcept([...learnMatches, ...teachMatches], req.user.id);
+
+    // 4. Fetch user profiles and compute matching skills
+    const matches = [];
+    for (const userId of matchUserIds) {
+      const userDoc = await db.collection('users').doc(userId).get();
+      if (!userDoc.exists) continue;
+      const u = userDoc.data();
+
+      // Skills this user can teach me
+      const matchingTeachSkills = (u.teachSkills || []).filter(skill => (me.learnSkills || []).includes(skill));
+      // Skills this user wants to learn from me
+      const matchingLearnSkills = (u.learnSkills || []).filter(skill => (me.teachSkills || []).includes(skill));
+
+      matches.push({
+        id: userId,
+        name: u.name,
+        email: u.email,
+        teachSkills: u.teachSkills,
+        learnSkills: u.learnSkills,
+        matchingTeachSkills,
+        matchingLearnSkills
+      });
+    }
+
+    res.json(matches);
+  } catch (err) {
+    console.error('Error fetching matches:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// In your user update endpoint (e.g., PUT /user/me)
+const updateSkillIndex = async (userId, oldTeach, oldLearn, newTeach, newLearn) => {
+  // Remove user from old skills
+  for (const skill of oldTeach) {
+    await db.collection('skills').doc(skill).update({
+      teachers: admin.firestore.FieldValue.arrayRemove(userId)
+    });
+  }
+  for (const skill of oldLearn) {
+    await db.collection('skills').doc(skill).update({
+      learners: admin.firestore.FieldValue.arrayRemove(userId)
+    });
+  }
+  // Add user to new skills
+  for (const skill of newTeach) {
+    await db.collection('skills').doc(skill).set({
+      teachers: admin.firestore.FieldValue.arrayUnion(userId)
+    }, { merge: true });
+  }
+  for (const skill of newLearn) {
+    await db.collection('skills').doc(skill).set({
+      learners: admin.firestore.FieldValue.arrayUnion(userId)
+    }, { merge: true });
+  }
+};
 
 module.exports = router;
